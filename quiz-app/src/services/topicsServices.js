@@ -67,6 +67,43 @@ answers: [  {  answer: "An open-source, progressive Javascript framework for bui
 
 
 
+]},
+{ name: "Cocktail",
+questions: [{
+
+question: "What is Rum made off?",
+answers: [  {  answer: "Sucar cane", correct: false },
+{  answer: "Potatos", correct: false }, 
+{  answer: "Cereals as malt and wheat", correct: true }, 
+{  answer: "Rice", correct: false },   ]
+},
+{
+question: "What is an Aperol",
+answers: [  {  answer: "Cocktial", correct: false },
+{  answer: "Liquor", correct: false }, 
+{  answer: "Spirit", correct: false }, 
+{  answer: "An Aperitif", correct: true },   ]
+},
+{
+question: "Which one of these cocktails its not made with Whsikey",
+answers: [  {  answer: "Old fashioned", correct: false },
+{  answer: "Negroni", correct: false }, 
+{  answer: "Penicilin ", correct: false }, 
+{  answer: "Manhattan", correct: true },   ]
+},
+{
+question: "What is Vue?",
+answers: [  {  answer: "An open-source, progressive Javascript framework for building user interfaces that aim to be incrementally adoptable", correct: true },
+{  answer: "An open-source JavaScript library that is used for building user interfaces specifically for single-page applications", correct: false }, 
+{  answer: "Supported by Google, is an open-source, JS-based software engineering platform for building user interfaces (front-end)", correct: false }, 
+{  answer: "A modern JS framework used to build static web apps. You can use It to build single, reusable components for projects of any kind", correct: false },   ]
+},
+
+
+
+
+
+
 ]}
 
 
