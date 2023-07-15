@@ -1,12 +1,12 @@
 <script setup>
-import {ref,defineEmits  } from 'vue';
+import {ref  } from 'vue';
 
 
 const props = defineProps({
   model: Object
 })
 
-const emit = defineEmits (['next-game'])
+const emit = defineEmits (['next-game','update-score'])
 
 const afterGame = ref (false);
 const winner = ref (false);
@@ -14,8 +14,8 @@ const loser = ref (false);
 
  
 const nextGame = () =>{
-    emit('next-game', winner.value);
-    console.log(winner.value + " winner value en el emit chd")
+    emit('next-game');
+ 
     afterGame.value = false;
     winner.value= false;
     loser.value=false;
@@ -25,8 +25,10 @@ const checkAnswer = (answer) =>{
   
   if (answer.correct){
    winner.value=true;
+   emit('update-score', winner.value);
   } else {
     loser.value= true;
+    emit('update-score', winner.value);
   }
 
 }
@@ -37,13 +39,19 @@ const checkAnswer = (answer) =>{
 </script>
 
 <template>
-  <div>
+  <div >
  
     <button v-show="afterGame" @click="nextGame()">Next question</button>
  
-    <div class="question"> {{ model.question }}</div> <span v-show="loser" class="wrong">Wrong answer!</span> <span v-show="winner" class="congrats">Congrats! Thats correct!</span>
-    <div :class="afterGame ? (answer.correct ? 'after-true' : 'after-false') : 'answer'" @click="checkAnswer(answer)" v-for="answer in model.answers" :key="answer.answer"> {{ answer.answer }}  </div>
+    <div class="question"> {{ model.question }}</div>
+    <div :class="loser? 'rubberBand' : ''">
+     <span v-show="loser"   :class="winner? '' : 'wrong '" >Wrong answer!</span>
+    </div>
+     <div :class="winner? 'animated-flip' : 'winner'"> <span v-show="winner" :class="winner? 'congrats animated-flip' : 'winner'">Congrats! Thats correct!</span></div>
 
+    <div :class="winner? 'vibrate-1' : 'vibrate-2'">
+    <div :class="afterGame ? (answer.correct ? 'after-true' : 'after-false') : 'answer'" @click="checkAnswer(answer)" v-for="answer in model.answers" :key="answer.answer"> {{ answer.answer }}  </div>
+  </div>
   </div>
 
 </template>
@@ -68,7 +76,7 @@ const checkAnswer = (answer) =>{
   font-family:   monospace;
   font-weight: 600;
   color: rgb(42, 49, 43);
-  font-size: 4rem;
+  font-size: 3rem;
 
 }
 
@@ -95,14 +103,14 @@ const checkAnswer = (answer) =>{
 .congrats{
     color: rgba(16, 114, 3, 0.884);
     font-family:   monospace;
-    font-size: 3rem;
+    font-size: 2rem;
 
 }
 
 .wrong{
     color: rgba(114, 16, 3, 0.884);
     font-family:   monospace;
-    font-size: 3rem;
+    font-size: 2rem;
 
 }
 </style>

@@ -1,82 +1,124 @@
 <script setup>
-import Track from './components/track.vue';
+import Track from './components/Track.vue';
+import Score from './components/Score.vue';
 import { ref,reactive } from 'vue';
+import {topics} from './services/topicsServices'
 
 const index = ref(0);
 const score = reactive({
       correctAnswer: 0,
       totalAnswer: 0,
     })
-const nextTrack = (winner) => {
-  console.log(winner + ' winner value en el parnt')
+  
+const game = ref(false);
+const gameOver = ref(false);
+   
+
+ const startGame = () => {
+  game.value = true;
+  gameOver.value = false;
+  restartScore();
+  time.reset();
+ }
+ const restartScore = ()=> {
+  score.correctAnswer = 0;
+  score.totalAnswer = 0;
+  index.value = 0;
+ }
+ const endGame = () => {
+  game.value=false;
+  gameOver.value = true;
+  time.stop();
+
+ 
+ 
+ }
+
+ const choice = ref();
+
+ const updateScore =  (winner) => {
   if(winner){
     score.correctAnswer++;
     score.totalAnswer++;
   } else {
     score.totalAnswer++;
   }
-  index.value++;
-}
-
-
-const tracks = [{
-    question: "What is Vue?",
-    answers: [  {  answer: "An open-source, progressive Javascript framework for building user interfaces that aim to be incrementally adoptable", correct: true },
-    {  answer: "An open-source JavaScript library that is used for building user interfaces specifically for single-page applications", correct: false }, 
-    {  answer: "Supported by Google, is an open-source, JS-based software engineering platform for building user interfaces (front-end)", correct: false }, 
-    {  answer: "A modern JS framework used to build static web apps. You can use It to build single, reusable components for projects of any kind", correct: false },   ]
-},
-{
-    question: "What are the major features of VueJS?",
-    answers: [  {  answer: "Virtual DOM, Components, JSX, Simplicity, Performance", correct: false },
-    {  answer: "Custom Components, Data Binding, Dependency Injection, Testing, Comprehensive, Browser Compatibility", correct: false }, 
-    {  answer: "Virtual DOM, Components, Templates, Routing, Light weight", correct: true }, 
-    {  answer: "Easy Sintax, fast modules, big partnerships", correct: false },   ]
-},
-{
-    question: "What are the lifecycle methods of VueJS?",
-    answers: [  {  answer: "Creation(Initialization), Mounted, Updating, Destruction", correct: true },
-    {  answer: " Mounted, Creation(Initialization), Updating, Destruction", correct: false }, 
-    {  answer: "Creation(Initialization), Updating, Destruction, Mounted", correct: false }, 
-    {  answer: "Creation(Initialization), Updating, , Mounted, Destruction", correct: false },   ]
-},
-{
-    question: "What is Vue?",
-    answers: [  {  answer: "An open-source, progressive Javascript framework for building user interfaces that aim to be incrementally adoptable", correct: true },
-    {  answer: "An open-source JavaScript library that is used for building user interfaces specifically for single-page applications", correct: false }, 
-    {  answer: "Supported by Google, is an open-source, JS-based software engineering platform for building user interfaces (front-end)", correct: false }, 
-    {  answer: "A modern JS framework used to build static web apps. You can use It to build single, reusable components for projects of any kind", correct: false },   ]
-},
-
-
-
-
-
-
-
-
-
-]
-
-const game = ref(false);
- const startGame = () => {
-  game.value = true;
  }
 
+const nextTrack = () => {
+ 
+if(index.value==(choice.value.length - 1)){
+endGame();
+
+} else {
+ 
+  index.value++;
+}}
+ 
+const startTimer = () => {
+  const time = reactive({  minutes: 0 , sec: 0, running: true});
+  let intervalId = null;
   
+  const startInterval = () => {
+    intervalId = setInterval(() => {
+      time.sec++;
+      if (time.sec === 60) {
+        time.minutes++;
+        time.sec = 0;
+      }
+    }, 1000);
+  };
+
+  startInterval();
+
+  time.stop = () => {
+    clearInterval(intervalId);
+    time.running = false;
+
+    
+  };
+
+  time.reset = () => {
+    clearInterval(intervalId);
+    time.minutes = 0;
+    time.sec = 0;
+    time.running = true;
+    startInterval();
+  };
+
+  return time;
+};
+
+
+const time = startTimer();
 
 </script>
 
 <template>
-  <div>
-    <h1 class="title"><span v-if="!game">Welcome to quiz App</span> <span v-else > Score {{ score.correctAnswer}} / {{ score.totalAnswer }}</span></h1>
-    <button @click="startGame()" v-show="!game">Start!</button>
- 
+  <div class="vibrate-1">   <span class="clock" v-if="game"> Timer     {{ time.minutes }}  : {{ time.sec }}</span>
+    <h1 ><span class="flip" v-if="!game && !gameOver">Welcome to quiz App</span> <span v-if="game && !gameOver" id="score"> Score {{ score.correctAnswer}} / {{ score.totalAnswer }} </span></h1> 
+    <Score v-if="gameOver"
+            :score="score"
+            :endTime="time"/>
+   
+    <form v-show="!game"> Select your subject
+      <select v-model="choice"  >
+       
+        
+        <option v-for="topic in topics" :key="topic.name" :value="topic.questions" > {{ topic.name }} </option>
+      </select>  
+
+    </form><i class="far fa-grin-squint"></i>
+    <div class="animated-flip"><button @click="startGame()"   v-show="!game">Start!</button></div>
+    
+    
     <Track v-if="game"
-           :model="tracks[index]"
+           :model="choice[index]"
            @next-game="nextTrack"
+           @update-score="updateScore"
            
            />
+
   </div>
 
 </template>
@@ -91,6 +133,13 @@ Color:transparent;
 letter-spacing: .5rem;
  
 } 
+#score{
+  font-size: 2rem;
+  border-color: rgb(54, 54, 54);
+  border-style: groove;
+  border-radius: .5rem;
+  padding: .5rem;
+}
 
 button{
   border-style: solid;
@@ -111,8 +160,19 @@ button:active{
   transform: translatex(1px);
   background-color: rgba(77, 74, 70, 0.6);
 
- 
-}
 
  
+}
+.clock{
+  color: #7d5304;
+  font-size: 1.5rem;
+  font-family: Candara, Calibri, Segoe, Segoe UI, Optima, Arial, sans-serif;
+  
+}
+
+form{
+  font-family:  Candara, Calibri, Segoe, Segoe UI, Optima, Arial, sans-serif;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
 </style>
